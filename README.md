@@ -1,6 +1,6 @@
 # dirlister
 
-A flask based directory exporer
+A flask based directory explorer
 
 ![](screenshot/dirlister.png)
 
