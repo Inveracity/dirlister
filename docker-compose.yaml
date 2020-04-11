@@ -1,6 +1,7 @@
 version: '3.7'
 services:
   dirlister:
+    restart: always
     build:
       context: .
       dockerfile: docker/dirlister.Dockerfile
