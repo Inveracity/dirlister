@@ -8,6 +8,8 @@ from flask import Flask
 from flask import render_template
 from flask import send_file
 
+import magic
+
 app = Flask(__name__)
 
 ROOT_FOLDER = os.environ.get("DIRLISTER_TARGET", "/")
@@ -45,7 +47,6 @@ def _file_properties(filepath, item):
     fileProperties             = {}
     fileProperties["filepath"] = filepath
     fileProperties["name"]     = item
-    fileProperties['type']     = stat.S_IFMT(sbuf.st_mode)
     fileProperties['mode']     = stat.S_IMODE(sbuf.st_mode)
     fileProperties['mtime']    = sbuf.st_mtime
     fileProperties['size']     = sbuf.st_size
