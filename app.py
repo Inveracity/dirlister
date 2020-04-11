@@ -7,10 +7,17 @@ from urllib.parse import unquote
 from flask import Flask
 from flask import render_template
 from flask import send_file
+from flask import redirect
+from flask import url_for
 
 app = Flask(__name__)
 
 ROOT_FOLDER = os.environ.get("DIRLISTER_TARGET", "/")
+
+@app.template_filter('previous')
+def _jinja2_previous_folder(cwd):
+    head, tail = os.path.split(cwd)
+    return head
 
 @app.template_filter('strftime')
 def _jinja2_filter_datetime(epoch):
@@ -70,10 +77,17 @@ def _hidden_item(item):
 
 def _get_metadata(cwd):
     # Get information about files and folders
-    files = []
-    dirs = []
+    files     = []
+    dirs      = []
+    directory = []
+    error     = False
 
-    for item in os.listdir(cwd):
+    try:
+        directory = os.listdir(cwd)
+    except FileNotFoundError:
+        error = True
+
+    for item in directory:
 
         # Do not display hidden files and folders
         if _hidden_item(item):
@@ -89,15 +103,16 @@ def _get_metadata(cwd):
             file_props = _file_properties(fullpath, item)
             files.append(file_props)
 
-    return dirs, files
+    return dirs, files, error
 
 
 @app.route('/')
 def browse():
 
     # List files and folders for the root directory
-    dirs, files = _get_metadata(ROOT_FOLDER)
+    dirs, files, _ = _get_metadata(ROOT_FOLDER)
     return render_template('browse.html', cwd=ROOT_FOLDER, dirs=dirs, files=files)
+
 
 @app.route('/b/<path:newPath>')
 def browser(newPath):
@@ -110,10 +125,14 @@ def browser(newPath):
 
     # List files and folders
     fullpath = os.path.join(ROOT_FOLDER, path)
-    dirs, files = _get_metadata(fullpath)
+    dirs, files, error = _get_metadata(fullpath)
 
-    return render_template('browse.html', cwd=path, dirs=dirs, files=files)
+    return render_template('browse.html', cwd=path, dirs=dirs, files=files, error=error)
 
+
+@app.errorhandler(404)
+def page_not_found(e):
+    return redirect("/")
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=80)

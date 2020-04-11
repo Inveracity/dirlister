@@ -7,9 +7,16 @@
     <div class="col-12">
       <div class="card bg-dark text-white">
           <div class="card-header">
+            <a href="/b/{{ cwd|previous }}" class="folder"> <i class="fa fa-chevron-left"></i></a>
             {{ cwd }}
           </div>
           <div class="card-block">
+            {% if error %}
+            <div class="alert alert-danger" role="alert">
+              File not found, return to
+            </div>
+
+            {% else %}
             <table class="table table-dark">
               <thead>
                 <tr>
@@ -41,6 +48,7 @@
 
               </tbody>
             </table>
+            {% endif %}
           </div>
         </div>
     </div>
