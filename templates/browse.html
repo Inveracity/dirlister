@@ -21,7 +21,7 @@
               </thead>
               <tbody>
 
-                {% for folder in dirs %}
+                {% for folder in dirs|sort(attribute="name") %}
                   <tr>
                     <td><a href="/b/{{ folder.relative|urlencode }}" class="folder"> <i class="fa fa-folder-o" class="label label-success"></i> {{ folder.name }} </a></td>
                     <td></td> <!-- Modified -->
@@ -30,7 +30,7 @@
                   </tr>
                 {% endfor %}
 
-                {% for file in files %}
+                {% for file in files|sort(attribute="name") %}
                   <tr>
                     <td> <a href="/b/{{ file.filepath|urlencode }}" class="file"> <i class="fa fa-download"></i> {{ file.name }} </a> </td>
                     <td> {{ file.mtime|strftime }} </td>
