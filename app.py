@@ -8,8 +8,6 @@ from flask import Flask
 from flask import render_template
 from flask import send_file
 
-import magic
-
 app = Flask(__name__)
 
 ROOT_FOLDER = os.environ.get("DIRLISTER_TARGET", "/")
