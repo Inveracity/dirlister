@@ -2,6 +2,7 @@ import os
 import stat
 import time
 import math
+from urllib.parse import unquote
 
 from flask import Flask
 from flask import render_template
@@ -97,17 +98,18 @@ def browse():
 
 @app.route('/b/<path:newPath>')
 def browser(newPath):
+    path = unquote(newPath)
 
     # Download a file
-    fullpath = os.path.sep+newPath
+    fullpath = os.path.sep+path
     if os.path.isfile(fullpath):
         return send_file(fullpath, as_attachment=True)
 
     # List files and folders
-    path = os.path.join(ROOT_FOLDER, newPath)
-    dirs, files = _get_metadata(path)
+    fullpath = os.path.join(ROOT_FOLDER, path)
+    dirs, files = _get_metadata(fullpath)
 
-    return render_template('browse.html', cwd=newPath, dirs=dirs, files=files)
+    return render_template('browse.html', cwd=path, dirs=dirs, files=files)
 
 
 if __name__ == '__main__':
