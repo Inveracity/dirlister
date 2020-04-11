@@ -19,18 +19,22 @@ def _jinja2_filter_datetime(epoch):
 
 @app.template_filter('data')
 def _jinja2_filter_convert_size(size_bytes):
-   if size_bytes == 0:
-       return "0B"
+    width = 7
+    size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
 
-   size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
+    if size_bytes != 0:
 
-   i = int(math.floor(math.log(size_bytes, 1024)))
-   p = math.pow(1024, i)
-   s = round(size_bytes / p, 1)
-   width = 5
-   string = f"{s: {width}} {size_name[i]}"
-   padded_html_string = string.replace(" ", "&nbsp;")
-   return padded_html_string
+        i = int(math.floor(math.log(size_bytes, 1024)))
+        p = math.pow(1024, i)
+        s = round(size_bytes / p, 1)
+
+    else:
+        s = 0
+        i = 0
+
+    string = f"{s: {width}} {size_name[i]}"
+    padded_html_string = string.replace(" ", "&nbsp;")
+    return padded_html_string
 
 def _file_properties(filepath, item):
     #Opening the file and getting metadata
