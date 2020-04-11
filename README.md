@@ -1,0 +1,2 @@
+# dirlister
+lists dirs
