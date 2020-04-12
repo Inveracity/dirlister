@@ -11,13 +11,14 @@ services:
     network_mode: host
     ports:
       - "8000:8000"
+    environment:
+      DIRLISTER_TARGET: /data # keep same as target
     volumes:
       - type: bind
         source: /mnt # The data on your computer
         target: /data # the folder in the container
 
-      - type: bind
-        source: ./filter.yaml # The data on your computer
-        target: /dirlister/filter.yaml # the folder in the container
-    environment:
-      DIRLISTER_TARGET: /data # keep same as target
+      ## Uncomment this to load a custom filter
+      #- type: bind
+      #  source: ./filter.yaml
+      #  target: /dirlister/filter.yaml

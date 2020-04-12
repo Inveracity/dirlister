@@ -10,8 +10,10 @@ from flask import send_file
 from flask import redirect
 
 from dirlister.config import ROOT_FOLDER
-from dirlister.config import filters
+from dirlister.config import load_filter
 from dirlister.directory import metadata
+
+filters = load_filter()
 
 app = Flask(__name__)
 
@@ -19,7 +21,7 @@ app = Flask(__name__)
 @app.template_filter('pretty')
 def _jinja2_previous_folder(name):
     ''' The back button uses this to set the parent folder '''
-
+    name, ext = os.path.splitext(name)
     # Make everything lowercase for simple filtration
     name = name.lower()
 
@@ -30,7 +32,7 @@ def _jinja2_previous_folder(name):
 
     # Replace each special character with a space
     name = re.sub(r'[^\w]', ' ', name)
-    return name.title()
+    return name.title().strip() + ext
 
 
 @app.template_filter('previous')
