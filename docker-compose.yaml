@@ -15,5 +15,9 @@ services:
       - type: bind
         source: /mnt # The data on your computer
         target: /data # the folder in the container
+
+      - type: bind
+        source: ./filter.yaml # The data on your computer
+        target: /dirlister/filter.yaml # the folder in the container
     environment:
       DIRLISTER_TARGET: /data # keep same as target

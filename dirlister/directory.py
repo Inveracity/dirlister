@@ -59,7 +59,9 @@ def metadata(cwd):
     try:
         directory = os.listdir(cwd)
     except FileNotFoundError:
-        error = True
+        error = f"File not found: {cwd}"
+    except PermissionError:
+        error = error = f"Permission denied: {cwd}"
 
     for item in directory:
 

@@ -13,7 +13,7 @@
           <div class="card-block">
             {% if error %}
             <div class="alert alert-danger" role="alert">
-              File not found, return to
+              {{ error }}
             </div>
 
             {% else %}
@@ -30,7 +30,7 @@
 
                 {% for folder in dirs|sort(attribute="name") %}
                   <tr>
-                    <td><a href="/b/{{ folder.relative|urlencode }}" class="folder"> <i class="fa fa-folder-o" class="label label-success"></i> {{ folder.name }} </a></td>
+                    <td><a href="/b/{{ folder.relative|urlencode }}" class="folder"> <i class="fa fa-folder-o" class="label label-success"></i> {{ folder.name|pretty }} </a></td>
                     <td></td> <!-- Modified -->
                     <td></td> <!-- Size -->
                     <td></td> <!-- Mode -->
@@ -39,7 +39,7 @@
 
                 {% for file in files|sort(attribute="name") %}
                   <tr>
-                    <td> <a href="/b/{{ file.filepath|urlencode }}" class="file"> <i class="fa fa-download"></i> {{ file.name }} </a> </td>
+                    <td> <a href="/b/{{ file.filepath|urlencode }}" class="file"> <i class="fa fa-download"></i> {{ file.name|pretty }} </a> </td>
                     <td> {{ file.mtime|strftime }} </td>
                     <td> {{ file.size|data|safe }} </td>
                     <td> {{ file.mode }}           </td>
