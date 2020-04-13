@@ -19,9 +19,11 @@ app = Flask(__name__)
 
 
 @app.template_filter('pretty')
-def _jinja2_previous_folder(name):
+def _jinja2_pretty(name, dir_or_file="dir"):
     ''' The back button uses this to set the parent folder '''
-    name, ext = os.path.splitext(name)
+    ext = ""
+    if "file" in dir_or_file:
+        name, ext = os.path.splitext(name)
     # Make everything lowercase for simple filtration
     name = name.lower()
 
