@@ -7,7 +7,7 @@ services:
       dockerfile: docker/dirlister.Dockerfile
     image: inveracity/dirlister:latest
     container_name: dirlister
-    command: gunicorn -b 0.0.0.0:8000 --timeout 600 app:app
+    command: gunicorn -b 0.0.0.0:8000 --workers 2 --threads 4 --timeout 600 app:app
     network_mode: host
     ports:
       - "8000:8000"
