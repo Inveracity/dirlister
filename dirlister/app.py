@@ -1,26 +1,27 @@
-import os
-import time
 import math
+import os
 import re
+import time
 from urllib.parse import unquote
 
 from flask import Flask
+from flask import redirect
 from flask import render_template
 from flask import send_file
-from flask import redirect
 
 from dirlister.config import ROOT_FOLDER
 from dirlister.config import load_filter
 from dirlister.directory import metadata
+
 
 filters = load_filter()
 
 app = Flask(__name__)
 
 
-@app.template_filter('pretty')
-def _jinja2_pretty(name, dir_or_file="dir"):
-    ''' The back button uses this to set the parent folder '''
+@app.template_filter("pretty")
+def _jinja2_pretty(name: str, dir_or_file: str = "dir") -> str:
+    """The back button uses this to set the parent folder"""
     ext = ""
     if "file" in dir_or_file:
         name, ext = os.path.splitext(name)
@@ -30,24 +31,24 @@ def _jinja2_pretty(name, dir_or_file="dir"):
     # Replace each filtered word with a space
     if filters:
         for i in filters["filters"]:
-            name = name.replace(i.lower(), ' ')
+            name = name.replace(i.lower(), " ")
 
     # Replace each special character with a space
-    name = re.sub(r'[^\w]', ' ', name)
+    name = re.sub(r"[^\w]", " ", name)
     return name.title().strip() + ext
 
 
-@app.template_filter('previous')
-def _jinja2_previous_folder(cwd):
-    ''' The back button uses this to set the parent folder '''
+@app.template_filter("previous")
+def _jinja2_previous_folder(cwd: str) -> str:
+    """The back button uses this to set the parent folder"""
 
     head, _ = os.path.split(cwd)
     return head
 
 
-@app.template_filter('strftime')
-def _jinja2_filter_datetime(epoch):
-    ''' a files modified time is given in epoch and converted to human readable time '''
+@app.template_filter("strftime")
+def _jinja2_filter_datetime(epoch: int) -> str:
+    """a files modified time is given in epoch and converted to human readable time"""
 
     if not epoch:
         return ""
@@ -56,9 +57,9 @@ def _jinja2_filter_datetime(epoch):
     return human_time
 
 
-@app.template_filter('data')
-def _jinja2_filter_convert_size(size_bytes):
-    ''' Convert bytes to closest measure '''
+@app.template_filter("data")
+def _jinja2_filter_convert_size(size_bytes: int) -> str:
+    """Convert bytes to closest measure"""
     width = 7
     size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
 
@@ -77,22 +78,22 @@ def _jinja2_filter_convert_size(size_bytes):
     return padded_html_string
 
 
-@app.route('/')
-def browse():
-    ''' List files and folders for the root directory'''
+@app.route("/")
+def browse() -> str:
+    """List files and folders for the root directory"""
 
     dirs, files, _ = metadata(ROOT_FOLDER)
 
-    return render_template('browse.html', cwd=ROOT_FOLDER, dirs=dirs, files=files)
+    return render_template("browse.html", cwd=ROOT_FOLDER, dirs=dirs, files=files)
 
 
-@app.route('/b/<path:newPath>')
-def browser(newPath):
-    ''' List files and folders of sub directory '''
+@app.route("/b/<path:newPath>")
+def browser(newPath: str) -> str:
+    """List files and folders of sub directory"""
 
     # convert url encoded characters back to normal
     path = unquote(newPath)
-    fullpath = os.path.sep+path
+    fullpath = os.path.sep + path
 
     # Download a file
     if os.path.isfile(fullpath):
@@ -102,10 +103,14 @@ def browser(newPath):
     fullpath = os.path.join(ROOT_FOLDER, path)
     dirs, files, error = metadata(fullpath)
 
-    return render_template('browse.html', cwd=path, dirs=dirs, files=files, error=error)
+    return render_template("browse.html", cwd=path, dirs=dirs, files=files, error=error)
 
 
-@app.errorhandler(404)
-def page_not_found(e):
-    ''' instead of display a 404 page, simply redirect back to root '''
+@app.errorhandler(404)  # type:ignore
+def page_not_found(e: Exception):  # NOQA: ANN201
+    """instead of display a 404 page, simply redirect back to root"""
     return redirect("/")
+
+
+if __name__ == "__main__":
+    app.run(host="0.0.0.0", port=8000, debug=True)

@@ -1,0 +1,26 @@
+[[source]]
+url = "https://pypi.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[packages]
+gunicorn = "*"
+Flask = "*"
+PyYAML = "*"
+
+[dev-packages]
+pylint = "*"
+flake8 = "*"
+flake8-isort = "*"
+flake8-annotations = "*"
+isort = "*"
+black = "==21.9b0"
+
+[requires]
+python_version = "3.9"
+
+[scripts]
+app = "gunicorn -b 0.0.0.0:8000 --workers 2 --threads 4 --timeout 600 dirlister.app:app"
+dev = "python -m dirlister.app"
+isort = "python -m isort ."
+lint = "python -m flake8 ."

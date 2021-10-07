@@ -1,4 +1,0 @@
-Flask
-gunicorn
-flake8
-pyyaml

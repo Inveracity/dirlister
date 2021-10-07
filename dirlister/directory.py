@@ -1,25 +1,28 @@
 import os
 import stat
+from typing import Literal
+from typing import Tuple
+from typing import Union
 
 from dirlister.config import ROOT_FOLDER
 
 
-def _file_properties(filepath, item):
-    ''' Opens a file to read its various properties '''
-    fileProperties             = {}
+def _file_properties(filepath: str, item: str) -> dict:
+    """Opens a file to read its various properties"""
+    fileProperties = {}
     fileProperties["filepath"] = filepath
-    fileProperties["name"]     = item
-    fileProperties['mode']     = 0
-    fileProperties['mtime']    = 0
-    fileProperties['size']     = 0
+    fileProperties["name"] = item
+    fileProperties["mode"] = 0
+    fileProperties["mtime"] = 0
+    fileProperties["size"] = 0
 
     try:
         fd = os.open(filepath, os.O_RDONLY)
         sbuf = os.fstat(fd)
         os.close(fd)
-        fileProperties['mode']     = stat.S_IMODE(sbuf.st_mode)
-        fileProperties['mtime']    = sbuf.st_mtime
-        fileProperties['size']     = sbuf.st_size
+        fileProperties["mode"] = stat.S_IMODE(sbuf.st_mode)
+        fileProperties["mtime"] = sbuf.st_mtime
+        fileProperties["size"] = sbuf.st_size
 
     except PermissionError:
         pass
@@ -28,17 +31,17 @@ def _file_properties(filepath, item):
         return fileProperties
 
 
-def _folder_properties(fullpath, item):
-    ''' set folder properties '''
-    folderProperties             = {}
+def _folder_properties(fullpath: str, item: str) -> dict:
+    """set folder properties"""
+    folderProperties = {}
     folderProperties["relative"] = fullpath.replace(ROOT_FOLDER, "", 1)
-    folderProperties["name"]     = item
+    folderProperties["name"] = item
 
     return folderProperties
 
 
-def _hidden_item(item):
-    ''' files and folders that are unwanted '''
+def _hidden_item(item: str) -> bool:
+    """files and folders that are unwanted"""
     if item.startswith("."):
         return True
 
@@ -49,12 +52,12 @@ def _hidden_item(item):
         return False
 
 
-def metadata(cwd):
-    ''' Get information about files and folders '''
-    files     = []
-    dirs      = []
+def metadata(cwd: str) -> Tuple[list, list, Union[Literal[False], str]]:
+    """Get information about files and folders"""
+    files = []
+    dirs = []
     directory = []
-    error     = False
+    error = False
 
     try:
         directory = os.listdir(cwd)
