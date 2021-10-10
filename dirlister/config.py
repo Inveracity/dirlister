@@ -1,3 +1,4 @@
+# pylint: disable=missing-module-docstring
 import os
 from pathlib import Path
 from textwrap import dedent
@@ -25,16 +26,16 @@ def load_filter() -> dict:
 
     filter_file = Path("filter.yaml")
     if not filter_file.exists():
-        filter_file.write_text(
-            dedent(
-                """
-                filters:
-                - "make a yaml list of things to filter from files and directory names"
-                """
-            ).lstrip()
-        )
+        default_content = dedent(
+            """
+            filters:
+              - "make a yaml list of things to filter from files and directory names"
+            """
+        ).lstrip()
 
-    filter_raw = filter_file.read_text()
+        filter_file.write_text(default_content, encoding="utf-8")
+
+    filter_raw = filter_file.read_text(encoding="utf-8")
 
     filters = yaml.safe_load(filter_raw)
 

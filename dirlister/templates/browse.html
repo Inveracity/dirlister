@@ -2,58 +2,65 @@
 {% block content %}
 
 <div class="container-fluid">
-  <div class="row">
-    <div class="col"></div>
-    <div class="col-12">
-      <div class="card bg-dark text-white">
-          <div class="card-header">
-            <a href="/b/{{ cwd|previous }}" class="folder"> <i class="fa fa-chevron-left"></i></a>
-            {{ cwd }}
-          </div>
-          <div class="card-block">
-            {% if error %}
-            <div class="alert alert-danger" role="alert">
-              {{ error }}
+    <div class="row">
+        <div class="col"></div>
+        <div class="col-12">
+            <div class="card bg-dark text-white">
+                <div class="card-header">
+                    <a href="/b/{{ cwd|previous }}" class="folder"> <i class="fa fa-chevron-left"></i></a>
+                    {{ cwd }}
+                    <p>TOTAL: {{disk_usage[0]}}
+                        USED: {{disk_usage[1]}}
+                        FREE: {{disk_usage[2]}}</p>
+                </div>
+                <div class="card-block">
+                    {% if error %}
+                    <div class="alert alert-danger" role="alert">
+                        {{ error }}
+                    </div>
+
+                    {% else %}
+                    <table class="table table-dark">
+                        <thead>
+                            <tr>
+                                <th> Name </th>
+                                <th> Modified </th>
+                                <th> Size </th>
+                                <th> Mode </th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            {% for folder in dirs|sort(attribute="name") %}
+                            <tr>
+                                <td><a href="/b/{{ folder.relative|urlencode }}" class="folder"> <i
+                                            class="fa fa-folder-o" class="label label-success"></i> {{
+                                        folder.name|pretty(dir_or_file="dir") }} </a></td>
+                                <td></td> <!-- Modified -->
+                                <td></td> <!-- Size -->
+                                <td></td> <!-- Mode -->
+                            </tr>
+                            {% endfor %}
+
+                            {% for file in files|sort(attribute="name") %}
+                            <tr>
+                                <td> <a href="/b/{{ file.filepath|urlencode }}" class="file"> <i
+                                            class="fa fa-download"></i> {{ file.name|pretty(dir_or_file="file") }} </a>
+                                </td>
+                                <td> {{ file.mtime|strftime }} </td>
+                                <td> {{ file.size|data|safe }} </td>
+                                <td> {{ file.mode }} </td>
+                            </tr>
+                            {% endfor %}
+
+                        </tbody>
+                    </table>
+                    {% endif %}
+                </div>
             </div>
-
-            {% else %}
-            <table class="table table-dark">
-              <thead>
-                <tr>
-                  <th> Name     </th>
-                  <th> Modified </th>
-                  <th> Size     </th>
-                  <th> Mode     </th>
-                </tr>
-              </thead>
-              <tbody>
-
-                {% for folder in dirs|sort(attribute="name") %}
-                  <tr>
-                    <td><a href="/b/{{ folder.relative|urlencode }}" class="folder"> <i class="fa fa-folder-o" class="label label-success"></i> {{ folder.name|pretty(dir_or_file="dir") }} </a></td>
-                    <td></td> <!-- Modified -->
-                    <td></td> <!-- Size -->
-                    <td></td> <!-- Mode -->
-                  </tr>
-                {% endfor %}
-
-                {% for file in files|sort(attribute="name") %}
-                  <tr>
-                    <td> <a href="/b/{{ file.filepath|urlencode }}" class="file"> <i class="fa fa-download"></i> {{ file.name|pretty(dir_or_file="file") }} </a> </td>
-                    <td> {{ file.mtime|strftime }} </td>
-                    <td> {{ file.size|data|safe }} </td>
-                    <td> {{ file.mode }}           </td>
-                  </tr>
-                {% endfor %}
-
-              </tbody>
-            </table>
-            {% endif %}
-          </div>
         </div>
+        <div class="col"></div>
     </div>
-    <div class="col"></div>
-  </div>
 </div>
 
 {% endblock content %}

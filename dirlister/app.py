@@ -1,4 +1,4 @@
-import math
+# pylint: disable=missing-module-docstring
 import os
 import re
 import time
@@ -11,6 +11,8 @@ from flask import send_file
 
 from dirlister.config import ROOT_FOLDER
 from dirlister.config import load_filter
+from dirlister.directory import byte_size_human_readable
+from dirlister.directory import disk_usage
 from dirlister.directory import metadata
 
 
@@ -59,21 +61,9 @@ def _jinja2_filter_datetime(epoch: int) -> str:
 
 @app.template_filter("data")
 def _jinja2_filter_convert_size(size_bytes: int) -> str:
-    """Convert bytes to closest measure"""
-    width = 7
-    size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
-
-    if size_bytes != 0:
-        i = int(math.floor(math.log(size_bytes, 1024)))
-        p = math.pow(1024, i)
-        s = round(size_bytes / p, 1)
-
-    else:
-        s = 0
-        i = 0
-
-    string = f"{s: {width}} {size_name[i]}"
-    padded_html_string = string.replace(" ", "&nbsp;")
+    """Convert bytes to closest measure and uri encode it"""
+    converted_bytes = byte_size_human_readable(size_bytes)
+    padded_html_string = converted_bytes.replace(" ", "&nbsp;")
 
     return padded_html_string
 
@@ -84,15 +74,17 @@ def browse() -> str:
 
     dirs, files, _ = metadata(ROOT_FOLDER)
 
-    return render_template("browse.html", cwd=ROOT_FOLDER, dirs=dirs, files=files)
+    return render_template(
+        "browse.html", cwd=ROOT_FOLDER, dirs=dirs, files=files, disk_usage=disk_usage()
+    )
 
 
-@app.route("/b/<path:newPath>")
-def browser(newPath: str) -> str:
+@app.route("/b/<path:new_path>")
+def browser(new_path: str) -> str:
     """List files and folders of sub directory"""
 
     # convert url encoded characters back to normal
-    path = unquote(newPath)
+    path = unquote(new_path)
     fullpath = os.path.sep + path
 
     # Download a file
@@ -103,11 +95,20 @@ def browser(newPath: str) -> str:
     fullpath = os.path.join(ROOT_FOLDER, path)
     dirs, files, error = metadata(fullpath)
 
-    return render_template("browse.html", cwd=path, dirs=dirs, files=files, error=error)
+    return render_template(
+        "browse.html",
+        cwd=path,
+        dirs=dirs,
+        files=files,
+        error=error,
+        disk_usage=disk_usage(),
+    )
 
 
 @app.errorhandler(404)  # type:ignore
-def page_not_found(e: Exception):  # NOQA: ANN201
+def page_not_found(
+    e: Exception,
+):  # NOQA: ANN201 # pylint: disable=unused-argument disable=invalid-name
     """instead of display a 404 page, simply redirect back to root"""
     return redirect("/")
 
